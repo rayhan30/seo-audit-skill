@@ -98,7 +98,7 @@ Claude will ask for any missing details (client name, location, date) and produc
 When running an audit, you can specify your agency:
 
 ```
-SEO audit for Aura Dental Centre, auradentalcentre.com, Winnipeg MB, April 2026.
+SEO audit for [Client Name], [clientwebsite.com], [City Province].
 Prepared by: Your Agency Name — Your Agency Tagline
 ```
 
