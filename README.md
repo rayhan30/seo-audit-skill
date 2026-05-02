@@ -41,16 +41,18 @@ When installed, this skill allows Claude to:
 
 ## Report Design
 
-The report is generated as a branded HTML widget with:
+The report is generated as a **downloadable PDF** (A4, print-ready) with:
 
 - **Cover page** — client name, URL, location, date, "Prepared by" (customisable)
 - **Score ring** — overall SEO health score out of 100
 - **Stat grid** — count of Critical / High / Medium / Passing findings
-- **Findings** — colour-coded by severity with fix instructions
-- **Next steps** — phased action plan
+- **Findings** — colour-coded by severity with exact fix instructions
+- **Next steps** — phased action plan on dark teal background
 
-Brand colours used: `#005F7F` (dark teal), `#3AC1CD` (cyan), `#EA661B` (orange)
-Font: Montserrat
+Brand colours: `#005F7F` (dark teal), `#3AC1CD` (cyan), `#EA661B` (orange)
+Font: Montserrat — Bold 700 headings, 500 subheadings, 400 body
+
+Output file named: `seo-audit-[client-slug]-[month]-[year].pdf`
 
 ---
 
@@ -98,7 +100,7 @@ Claude will ask for any missing details (client name, location, date) and produc
 When running an audit, you can specify your agency:
 
 ```
-SEO audit for [Client Name], [clientwebsite.com], [City Province].
+SEO audit for [Client Name], [clientwebsite.com], [City Province], [Month Year].
 Prepared by: Your Agency Name — Your Agency Tagline
 ```
 

@@ -72,7 +72,7 @@ For items you cannot verify programmatically, note as "Manual check recommended"
 - [ ] Primary keyword present in: `<title>`, `<h1>`, first paragraph, image alt text
 - [ ] Location modifier present where relevant (city/region for local businesses)
 - [ ] No keyword stuffing
-- [ ] Service pages target specific keywords (e.g. "Invisalign Winnipeg" not just "Invisalign")
+- [ ] Service pages target specific keywords (e.g. "Plumber Toronto" not just "Plumber")
 - [ ] Flag pages where keyword targeting is weak or generic
 
 ---
@@ -204,34 +204,79 @@ For items you cannot verify programmatically, note as "Manual check recommended"
 
 ## Output Format
 
-Always produce the report as a **branded HTML widget** with two sections:
+Always produce the report as a **downloadable PDF file** using the following process:
 
-### Cover Page
-- "SEO AUDIT REPORT" heading on dark teal (#005F7F) background with cyan (#3AC1CD) diagonal accent
+### Step 1 — Build the HTML source
+
+Create a full HTML file (`/home/claude/seo-audit-report.html`) with these two pages:
+
+**Cover page:**
+- "SEO AUDIT REPORT" heading on dark teal (`#005F7F`) background
+- Cyan (`#3AC1CD`) diagonal accent strip below header
 - Client name, website URL, city/location, date
-- "Prepared by" footer: show Agency Name and Agency Tagline if provided; leave blank if not
+- "Prepared by" footer: Agency Name and Agency Tagline if provided, blank if not
 
-### Report Page
-- Score ring out of 100
+**Report page:**
+- Score ring (SVG circle) out of 100
 - Stat grid: Critical / High / Medium / Passing counts
 - Summary paragraph (2–3 sentences, most critical issues upfront)
 - Findings grouped by severity with colour-coded badges
-- Each finding includes: issue name, what was found, why it matters, exact fix instruction
+- Each finding: issue name, what was found, why it matters, exact fix instruction
 - List affected pages by name/URL where multiple pages share the same issue
-- Recommended next steps (phased, max 5–6 steps) on dark teal background footer
+- Recommended next steps (max 5–6, numbered) on dark teal background
+- Tools row at bottom: PageSpeed Insights, Google Search Console, Rich Results Test, Screaming Frog
 
 ### Design Tokens
 - Brand colours: `#005F7F` dark teal, `#3AC1CD` cyan, `#EA661B` orange
-- Font: Montserrat (Bold 700 headings, 500 subheadings, 400 body)
-- Import from Google Fonts
+- Font: Montserrat via Google Fonts (`@import` in `<style>`)
+- Bold 700 headings, 500 subheadings, 400 body, 11px minimum font size
+- A4 page size (`@page { size: A4; margin: 0; }`)
+- Use `page-break-after: always` on cover page
+- Use `page-break-inside: avoid` on each finding card
 
 ### Report Sections (always include all)
 1. Technical SEO Findings
 2. Content & Keyword Opportunities
 3. Website Speed & Performance
 4. Local SEO Signals
-5. Plugin Audit (if WordPress/CMS detected)
+5. Plugin Audit (if WordPress/Shopify detected)
 6. Recommended Next Steps
+
+### Step 2 — Convert HTML to PDF
+
+```python
+import subprocess
+subprocess.run([
+    'python3', '-c',
+    '''
+import sys
+try:
+    from weasyprint import HTML
+    HTML(filename="/home/claude/seo-audit-report.html").write_pdf("/mnt/user-data/outputs/seo-audit-report.pdf")
+    print("PDF generated with WeasyPrint")
+except ImportError:
+    import subprocess
+    result = subprocess.run(
+        ["chromium", "--headless", "--no-sandbox", "--print-to-pdf=/mnt/user-data/outputs/seo-audit-report.pdf",
+         "--print-to-pdf-no-header", "/home/claude/seo-audit-report.html"],
+        capture_output=True, text=True
+    )
+    if result.returncode != 0:
+        subprocess.run(
+            ["wkhtmltopdf", "--page-size", "A4", "--margin-top", "0",
+             "--margin-bottom", "0", "--margin-left", "0", "--margin-right", "0",
+             "/home/claude/seo-audit-report.html", "/mnt/user-data/outputs/seo-audit-report.pdf"],
+            check=True
+        )
+        print("PDF generated with wkhtmltopdf")
+'''
+], check=True)
+```
+
+Name the output file: `seo-audit-[client-slug]-[month]-[year].pdf`
+Example: `seo-audit-halalgrocery-may-2026.pdf`
+
+Then use `present_files` to deliver the PDF to the user.
 
 ---
 
@@ -245,8 +290,10 @@ Always produce the report as a **branded HTML widget** with two sections:
 6. Detect CMS from HTML clues (WordPress: `wp-content`, `wp-json`; Shopify: `cdn.shopify.com`).
 7. Apply CMS-specific checks.
 8. Compile all findings with severity ratings.
-9. Produce the branded HTML report.
-10. Offer to export as `.docx` or PDF if the user wants to send to the client.
+9. Build the branded HTML file at `/home/claude/seo-audit-report.html`.
+10. Install weasyprint if not available: `pip install weasyprint --break-system-packages -q`
+11. Convert HTML to PDF and save to `/mnt/user-data/outputs/`.
+12. Use `present_files` to deliver the PDF download to the user.
 
 ---
 
